@@ -1,0 +1,2 @@
+include ':app', ':wallet_sdk'
+rootProject.name='Wallet SDK'
