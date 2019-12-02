@@ -1,12 +1,13 @@
 package com.qiibee.wallet
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
-import com.qiibee.wallet_sdk.Wallet
+import com.qiibee.wallet_sdk.client.CryptoWallet
+import com.qiibee.wallet_sdk.util.Failure
+import com.qiibee.wallet_sdk.util.Success
 
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,16 +18,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-
-        val wallet = Wallet()
-
-        findViewById<TextView>(R.id.txt).let {
-            it?.text = wallet.p
-        }
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, wallet.show_wallet(), Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        when (val result = CryptoWallet.loadWallet()) {
+            is Success -> Log.d("TAG", result.value.address)
+            is Failure -> Log.d("TAG", "FAILER")
         }
     }
 
