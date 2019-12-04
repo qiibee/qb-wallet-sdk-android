@@ -14,11 +14,29 @@ object CryptoWallet: SDKProvider {
     private val walletStorage: WalletProvider = WalletSimple
     private val cryptoService: CryptoProvider = CryptoService
 
-    override fun loadWallet(): Result<PublicAddress, Exception> {
+    override fun loadWallet(): Result<WalletAddress, Exception> {
         return walletStorage.publicAddress()
     }
 
     override fun walletExists(): Boolean {
         return walletStorage.walletExists()
     }
+
+    override fun mnemonicPhrase(): Result<Mnemonic, Exception> {
+        return walletStorage.mnemonicPhrase()
+    }
+
+    override fun privateKey(): Result<PrivateKey, Exception> {
+        return walletStorage.privateKey()
+    }
+
+    override fun getBalance() {
+        //apiService.getBalance()
+    }
+
+    override fun sendTokens() {
+        //apiService.sendTokens()
+    }
+
+
 }

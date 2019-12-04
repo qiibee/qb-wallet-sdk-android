@@ -1,15 +1,15 @@
 package com.qiibee.wallet_sdk.interfaces
 
-import com.qiibee.wallet_sdk.client.PublicAddress
+import com.qiibee.wallet_sdk.client.WalletAddress
 
 interface HttpClient {
     fun redeem(callback: () -> Unit)
 
     fun transfer(callback: () -> Unit)
 
-    fun getBalance(publicAddress: PublicAddress): String
+    fun getBalance(walletAddress: WalletAddress): String
 
-    fun getTokens(publicAddress: PublicAddress): String
+    fun sendTokens(walletAddress: WalletAddress): String
 
-    fun getTransactions(publicAddress: PublicAddress): String
+    fun getTransactions(walletAddress: WalletAddress): String
 }
