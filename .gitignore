@@ -13,3 +13,4 @@
 /captures
 .externalNativeBuild
 .cxx
+/wallet_sdk/src/main/java/com/qiibee/wallet_sdk/services/WalletSimple.kt
