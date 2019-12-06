@@ -6,14 +6,17 @@ import com.qiibee.wallet_sdk.interfaces.SDKProvider
 import com.qiibee.wallet_sdk.interfaces.WalletProvider
 import com.qiibee.wallet_sdk.services.ApiService
 import com.qiibee.wallet_sdk.services.CryptoService
-import com.qiibee.wallet_sdk.services.WalletSimple
 import com.qiibee.wallet_sdk.util.Result
+import org.web3j.crypto.Hash
+import java.math.BigDecimal
 
 object CryptoWallet: SDKProvider {
     private val apiService: HttpClient = ApiService
-    private val walletStorage: WalletProvider = WalletSimple
+    // TODO needs correct storage
+    private val walletStorage: WalletProvider = WalletProvider
     private val cryptoService: CryptoProvider = CryptoService
 
+    // STORAGE RELATED
     override fun loadWallet(): Result<WalletAddress, Exception> {
         return walletStorage.publicAddress()
     }
@@ -30,12 +33,46 @@ object CryptoWallet: SDKProvider {
         return walletStorage.privateKey()
     }
 
-    override fun getBalance() {
-        //apiService.getBalance()
+    // WALLET RELATED
+    override fun createWallet(): Result<WalletAddress, java.lang.Exception> {
+        TODO("not implemented")
+
+        // Create Wallet with crypto Service
+
+        // Store Wallet to walletStorage
+
+        // return back WalletAddress
     }
 
-    override fun sendTokens() {
-        //apiService.sendTokens()
+    // BACKEND API RELATED
+    override fun getBalances(
+        walletAddress: WalletAddress,
+        responseHandler: (result: Result<TokenBalances, Exception>) -> Unit
+    ) {
+        apiService.getBalances(walletAddress, responseHandler)
+    }
+
+    override fun getTokens(
+        walletAddress: WalletAddress,
+        responseHandler: (result: Result<List<Token>, java.lang.Exception>) -> Unit
+    ) {
+        TODO("not implemented")
+    }
+
+    override fun getTransactions(
+        walletAddress: WalletAddress,
+        responseHandler: (result: Result<List<Transaction>, java.lang.Exception>) -> Unit
+    ) {
+        TODO("not implemented")
+    }
+
+    override fun transferTokens(
+        toAddress: WalletAddress,
+        contractAddress: WalletAddress,
+        sendTokenValue: BigDecimal,
+        responseHandler: (result: Result<Hash, java.lang.Exception>) -> Unit
+    ) {
+        TODO("not implemented")
     }
 
 

@@ -1,12 +1,12 @@
 package com.qiibee.wallet_sdk.client
 
 import com.qiibee.wallet_sdk.util.Assertion
-import com.qiibee.wallet_sdk.util.InvalidPublicAddress
+import com.qiibee.wallet_sdk.util.InvalidWalletAddress
 
-class WalletAddress(val address: String) {
+data class WalletAddress(val address: String) {
     init {
         if (!Assertion.isValidAddress(address)) {
-            throw InvalidPublicAddress("Wallet Address not valid")
+            throw InvalidWalletAddress(address)
         }
     }
 }

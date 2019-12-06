@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import com.qiibee.wallet_sdk.client.CryptoWallet
+import com.qiibee.wallet_sdk.client.WalletAddress
 import com.qiibee.wallet_sdk.util.Failure
+import com.qiibee.wallet_sdk.util.Logger
 import com.qiibee.wallet_sdk.util.Success
 
 import kotlinx.android.synthetic.main.activity_main.*
@@ -19,8 +21,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         when (val result = CryptoWallet.loadWallet()) {
-            is Success -> Log.d("TAG", result.value.address)
-            is Failure -> Log.d("TAG", "FAILER")
+            is Success -> loadBalances(result.value)
+            is Failure -> Logger.log("LOAD WALLET FAILED")
         }
     }
 
@@ -37,6 +39,20 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun loadBalances(walletAddress: WalletAddress) {
+        CryptoWallet.getBalances(walletAddress) { result ->
+            when (result) {
+                is Success -> {
+                    Logger.log(result.toString())
+                }
+
+                is Failure -> {
+                    Logger.log(result.toString())
+                }
+            }
         }
     }
 }

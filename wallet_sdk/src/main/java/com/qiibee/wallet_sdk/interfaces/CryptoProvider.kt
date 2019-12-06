@@ -6,6 +6,7 @@ import java.lang.Exception
 
 interface CryptoProvider {
     fun createMnemonic(): Result<Mnemonic, Exception>
+
     // TODO add return type here
     fun createWallet()
 }

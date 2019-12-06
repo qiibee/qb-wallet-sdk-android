@@ -20,12 +20,12 @@ object CryptoService: CryptoProvider {
             return Success(Mnemonic(mnemonic))
 
         } catch (error: Exception) {
-            return Failure(WalletCreateFailed("Wallet creation failed"))
+            return Failure(WalletCreateFailed("Wallet creation failed with ${error.message}"))
         }
     }
 
     override fun createWallet() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented")
         //val k = ECKeyPair.create(WalletSimple.mnemonic.toByteArray(Compat.UTF_8))
         //val credentials = Credentials.create(ECKeyPair(k.privateKey, k.publicKey))
         // return PublicAddress(credentials.address)

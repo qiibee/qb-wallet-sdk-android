@@ -6,3 +6,9 @@ internal object Util {
     fun notImplemented(): Nothing = throw Error("Code not yet implemented")
 
 }
+
+internal object CryptoUtils {
+    fun signTx() {
+        // TODO
+    }
+}
