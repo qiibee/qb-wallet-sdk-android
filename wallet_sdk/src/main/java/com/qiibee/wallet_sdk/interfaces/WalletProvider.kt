@@ -15,4 +15,5 @@ interface WalletProvider {
 
     fun walletExists(): Boolean
 
+    fun getCredentials(): org.web3j.crypto.Credentials
 }

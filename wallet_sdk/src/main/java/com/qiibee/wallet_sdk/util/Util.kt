@@ -1,5 +1,6 @@
 package com.qiibee.wallet_sdk.util
 
+import org.web3j.crypto.*
 import java.lang.Error
 
 internal object Util {
@@ -8,7 +9,7 @@ internal object Util {
 }
 
 internal object CryptoUtils {
-    fun signTx() {
-        // TODO
+    fun signTx(rawTx: RawTransaction, credentials: Credentials): ByteArray {
+        return TransactionEncoder.signMessage(rawTx, credentials)
     }
 }

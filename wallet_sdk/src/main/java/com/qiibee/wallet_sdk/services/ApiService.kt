@@ -2,28 +2,26 @@ package com.qiibee.wallet_sdk.services
 
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.result.Result
-import com.qiibee.wallet_sdk.client.Token
-import com.qiibee.wallet_sdk.client.TokenBalances
-import com.qiibee.wallet_sdk.client.Transaction
-import com.qiibee.wallet_sdk.client.WalletAddress
+import com.qiibee.wallet_sdk.client.*
 import com.qiibee.wallet_sdk.interfaces.HttpClient
 import com.qiibee.wallet_sdk.util.*
+import org.json.JSONObject
+import org.web3j.crypto.Credentials
+import org.web3j.crypto.Hash
 import org.web3j.crypto.RawTransaction
-import org.web3j.crypto.SignedRawTransaction
 import java.lang.Exception
 import java.math.BigDecimal
 
 internal object ApiService: HttpClient {
-    private val HTTPS = "https://"
-    private val QB_API = "${HTTPS}api.qiibee.com"
-    private val QB_APP_API = "${QB_API}/app"
+    private const val QB_API = "https://api.qiibee.com"
+    private const val QB_APP_API = "${QB_API}/app"
 
     override fun getBalances(
         walletAddress: WalletAddress,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<TokenBalances, Exception>) -> Unit
     ) {
         Fuel.get( "$QB_APP_API/addresses/${walletAddress.address}?public=true")
-            .responseObject(TokenBalances.Deserializer()) { _, _, result ->
+            .responseObject(JsonDeserializer.TokenBalancesDeserializer()) { _, _, result ->
                 when (result) {
                     is Result.Failure -> {
                         val (_, error) = result
@@ -37,34 +35,112 @@ internal object ApiService: HttpClient {
             }
     }
 
-    override fun getRawTransaction(
-        address: WalletAddress,
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
-        sendTokenValue: BigDecimal,
-        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<RawTransaction, Exception>) -> Unit
-    ) {
-        TODO("not implemented")
-    }
-
     override fun getTokens(
         walletAddress: WalletAddress,
-        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<List<Token>, Exception>) -> Unit
+        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Tokens, Exception>) -> Unit
     ) {
-        TODO("not implemented")
+        Fuel.get( "$QB_API/tokens?public=true&walletAddress=${walletAddress.address}")
+            .responseObject(JsonDeserializer.TokensDeserializer()) { _, _, result ->
+                when (result) {
+                    is Result.Failure -> {
+                        val (_, error) = result
+                        responseHandler.invoke(Failure(GetTokenBalancesFailed("${error?.message}")))
+                    }
+                    is Result.Success -> {
+                        val (data, _) = result
+                        responseHandler.invoke(Success(data as Tokens))
+                    }
+                }
+            }
     }
 
     override fun getTransactions(
         walletAddress: WalletAddress,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<List<Transaction>, Exception>) -> Unit
     ) {
-        TODO("not implemented")
+        Fuel.get( "$QB_API/transactions/${walletAddress.address}/history")
+            .responseObject(JsonDeserializer.TransactionsDeserializer()) { _, _, result ->
+                when (result) {
+                    is Result.Failure -> {
+                        val (_, error) = result
+                        Logger.log(result.toString())
+                        responseHandler.invoke(Failure(GetTransactionsFailed("${error?.message}")))
+                    }
+                    is Result.Success -> {
+                        val (data, _) = result
+                        responseHandler.invoke(Success(data as List<Transaction>))
+                    }
+                }
+            }
     }
 
-    override fun sendSignedTransaction(
-        signedTx: SignedRawTransaction,
-        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<SignedRawTransaction, Exception>) -> Unit
+    override fun sendTransaction(
+        fromAddress: WalletAddress,
+        credentials: Credentials,
+        toAddress: WalletAddress,
+        contractAddress: WalletAddress,
+        sendTokenValue: BigDecimal,
+        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Hash, Exception>) -> Unit
     ) {
-        TODO("not implemented")
+        getRawTransaction(fromAddress, toAddress, contractAddress, sendTokenValue) {
+            when (it) {
+                is Success -> {
+                    val rawTx = it.value
+                    val signedTx = CryptoUtils.signTx(rawTx, credentials)
+                    sendSignedTransaction(signedTx, responseHandler)
+                }
+
+                is Failure -> {
+                    responseHandler.invoke(it)
+                }
+            }
+        }
+    }
+
+    private fun getRawTransaction(
+        fromAddress: WalletAddress,
+        toAddress: WalletAddress,
+        contractAddress: WalletAddress,
+        sendTokenValue: BigDecimal,
+        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<RawTransaction, Exception>) -> Unit
+    ) {
+        Fuel.get( "$QB_API/transactions/raw?from=${fromAddress.address}&to=${toAddress.address}&contractAddress=${contractAddress.address}&transferAmount=${sendTokenValue}")
+            .responseObject(JsonDeserializer.RawTxDeserializer()) { _, _, result ->
+                when (result) {
+                    is Result.Failure -> {
+                        val (_, error) = result
+                        responseHandler.invoke(Failure(GetTokenBalancesFailed("${error?.message}")))
+                    }
+                    is Result.Success -> {
+                        val (data, _) = result
+                        responseHandler.invoke(Success(data as RawTransaction))
+                    }
+                }
+            }
+    }
+
+    private fun sendSignedTransaction(
+        signedTx: ByteArray,
+        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Hash, Exception>) -> Unit
+    ) {
+        Fuel.post( "$QB_API/transactions/").body(stringifySignedTx(signedTx))
+            .responseObject(JsonDeserializer.SendTransactionDeserializer()) { _, _, result ->
+                when (result) {
+                    is Result.Failure -> {
+                        val (_, error) = result
+                        Logger.log(result.toString())
+                        responseHandler.invoke(Failure(GetTransactionsFailed("${error?.message}")))
+                    }
+                    is Result.Success -> {
+                        val (data, _) = result
+                        responseHandler.invoke(Success(data as Hash))
+                    }
+                }
+            }
+    }
+
+    private fun stringifySignedTx(signedTx: ByteArray): String {
+        val jsonObject = JSONObject()
+        return jsonObject.put("data", signedTx.toString()).toString()
     }
 }

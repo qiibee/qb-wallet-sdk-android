@@ -21,17 +21,14 @@ interface SDKProvider {
 
     // Backend API Related
     fun getBalances(
-        walletAddress: WalletAddress,
         responseHandler: (result: Result<TokenBalances, Exception>) -> Unit
     )
 
     fun getTokens(
-        walletAddress: WalletAddress,
-        responseHandler: (result: Result<List<Token>, Exception>) -> Unit
+        responseHandler: (result: Result<Tokens, Exception>) -> Unit
     )
 
     fun getTransactions(
-        walletAddress: WalletAddress,
         responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     )
 

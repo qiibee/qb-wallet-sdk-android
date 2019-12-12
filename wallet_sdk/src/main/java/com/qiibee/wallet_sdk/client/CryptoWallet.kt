@@ -6,13 +6,16 @@ import com.qiibee.wallet_sdk.interfaces.SDKProvider
 import com.qiibee.wallet_sdk.interfaces.WalletProvider
 import com.qiibee.wallet_sdk.services.ApiService
 import com.qiibee.wallet_sdk.services.CryptoService
+import com.qiibee.wallet_sdk.services.WalletSimple
+import com.qiibee.wallet_sdk.util.Failure
 import com.qiibee.wallet_sdk.util.Result
+import com.qiibee.wallet_sdk.util.Success
 import org.web3j.crypto.Hash
 import java.math.BigDecimal
 
 object CryptoWallet: SDKProvider {
     private val apiService: HttpClient = ApiService
-    // TODO needs correct storage
+    // TODO needs correct storage implementation
     private val walletStorage: WalletProvider = WalletProvider
     private val cryptoService: CryptoProvider = CryptoService
 
@@ -45,25 +48,30 @@ object CryptoWallet: SDKProvider {
     }
 
     // BACKEND API RELATED
-    override fun getBalances(
-        walletAddress: WalletAddress,
-        responseHandler: (result: Result<TokenBalances, Exception>) -> Unit
-    ) {
-        apiService.getBalances(walletAddress, responseHandler)
+    override fun getBalances(responseHandler: (result: Result<TokenBalances, Exception>) -> Unit) {
+        val result = walletStorage.publicAddress()
+        when (result) {
+            is Success -> apiService.getBalances(result.value, responseHandler)
+            is Failure -> responseHandler.invoke(result)
+        }
     }
 
-    override fun getTokens(
-        walletAddress: WalletAddress,
-        responseHandler: (result: Result<List<Token>, java.lang.Exception>) -> Unit
-    ) {
-        TODO("not implemented")
+    override fun getTokens(responseHandler: (result: Result<Tokens, java.lang.Exception>) -> Unit) {
+        val result = walletStorage.publicAddress()
+        when (result) {
+            is Success -> apiService.getTokens(result.value, responseHandler)
+            is Failure -> responseHandler.invoke(result)
+        }
     }
 
     override fun getTransactions(
-        walletAddress: WalletAddress,
         responseHandler: (result: Result<List<Transaction>, java.lang.Exception>) -> Unit
     ) {
-        TODO("not implemented")
+        val result = walletStorage.publicAddress()
+        when (result) {
+            is Success -> apiService.getTransactions(result.value, responseHandler)
+            is Failure -> responseHandler.invoke(result)
+        }
     }
 
     override fun transferTokens(
@@ -72,7 +80,23 @@ object CryptoWallet: SDKProvider {
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<Hash, java.lang.Exception>) -> Unit
     ) {
-        TODO("not implemented")
+        val result = walletStorage.publicAddress()
+        val credentials = walletStorage.getCredentials()
+
+        when (result) {
+            is Success -> {
+                val fromAddress = result.value
+                apiService.sendTransaction(
+                    fromAddress,
+                    credentials,
+                    toAddress,
+                    contractAddress,
+                    sendTokenValue,
+                    responseHandler
+                )
+            }
+            is Failure -> responseHandler.invoke(result)
+        }
     }
 
 

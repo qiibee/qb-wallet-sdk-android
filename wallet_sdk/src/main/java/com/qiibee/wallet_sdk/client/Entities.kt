@@ -1,10 +1,7 @@
 package com.qiibee.wallet_sdk.client
 
-import com.github.kittinunf.fuel.core.ResponseDeserializable
-import com.google.gson.Gson
 import com.qiibee.wallet_sdk.util.Assertion
-import com.qiibee.wallet_sdk.util.InvalidTokenName
-import com.qiibee.wallet_sdk.util.JsonDeserializer
+import com.qiibee.wallet_sdk.util.InvalidTokenSymbol
 import java.math.BigDecimal
 import java.sql.Timestamp
 
@@ -12,19 +9,18 @@ data class TokenBalances(
     val transactionCount: Int,
     val balances: Balances,
     val aggValue: AggregateValue
-) {
-    class Deserializer: ResponseDeserializable<TokenBalances> {
-        override fun deserialize(content: String): TokenBalances {
-            return JsonDeserializer.deserializeTokenBalances(content)
-        }
-    }
-}
+)
 
 data class AggregateValue(val USD: BigDecimal)
 data class ETHBalance(val balance: BigDecimal)
 
-data class Token(
-    val name: TokenName,
+data class Tokens (
+    val privateTokens: List<Token>,
+    val publicTokens: List<Token>
+)
+
+data class Token (
+    val symbol: TokenSymbol,
     val balance: BigDecimal,
     val contractAddress: WalletAddress
 )
@@ -35,10 +31,10 @@ data class Balances(
     val ethBalance: ETHBalance
 )
 
-data class TokenName(val name: String) {
+data class TokenSymbol(val symbol: String) {
     init {
-        if (!Assertion.isValidTokenName(name)) {
-            throw InvalidTokenName(name)
+        if (!Assertion.isValidTokenSymbol(symbol)) {
+            throw InvalidTokenSymbol(symbol)
         }
     }
 }
@@ -46,16 +42,10 @@ data class TokenName(val name: String) {
 data class Transaction(
     val to: WalletAddress,
     val from: WalletAddress,
+    val contractAddress: WalletAddress,
     val timestamp: Timestamp,
-    val contractAddress: WalletAddress
-) {
-    class Deserializer: ResponseDeserializable<Transaction> {
-        override fun deserialize(content: String): Transaction {
-            return Gson().fromJson(content, Transaction::class.java)
-        }
-    }
-}
-
+    val token: Token
+)
 
 
 
