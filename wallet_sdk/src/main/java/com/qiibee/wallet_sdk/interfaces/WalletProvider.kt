@@ -4,7 +4,6 @@ import com.qiibee.wallet_sdk.client.Mnemonic
 import com.qiibee.wallet_sdk.client.PrivateKey
 import com.qiibee.wallet_sdk.client.WalletAddress
 import com.qiibee.wallet_sdk.util.Result
-import java.lang.Exception
 
 interface WalletProvider {
     fun publicAddress(): Result<WalletAddress, Exception>

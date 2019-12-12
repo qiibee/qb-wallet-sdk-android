@@ -7,7 +7,6 @@ import com.qiibee.wallet_sdk.util.Result
 import com.qiibee.wallet_sdk.util.Success
 import com.qiibee.wallet_sdk.util.WalletCreateFailed
 import org.web3j.crypto.MnemonicUtils
-import java.lang.Exception
 import java.security.SecureRandom
 
 object CryptoService: CryptoProvider {

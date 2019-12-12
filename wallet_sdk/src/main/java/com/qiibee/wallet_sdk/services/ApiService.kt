@@ -9,7 +9,6 @@ import org.json.JSONObject
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.Hash
 import org.web3j.crypto.RawTransaction
-import java.lang.Exception
 import java.math.BigDecimal
 
 internal object ApiService: HttpClient {

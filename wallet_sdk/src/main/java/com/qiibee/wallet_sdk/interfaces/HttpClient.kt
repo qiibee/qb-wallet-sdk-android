@@ -4,7 +4,6 @@ import com.qiibee.wallet_sdk.client.*
 import com.qiibee.wallet_sdk.util.Result
 import org.web3j.crypto.Credentials
 import org.web3j.crypto.Hash
-import java.lang.Exception
 import java.math.BigDecimal
 
 interface HttpClient {

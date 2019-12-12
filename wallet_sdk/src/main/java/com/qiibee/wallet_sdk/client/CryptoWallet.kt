@@ -37,7 +37,7 @@ object CryptoWallet: SDKProvider {
     }
 
     // WALLET RELATED
-    override fun createWallet(): Result<WalletAddress, java.lang.Exception> {
+    override fun createWallet(): Result<WalletAddress, Exception> {
         TODO("not implemented")
 
         // Create Wallet with crypto Service
@@ -56,7 +56,7 @@ object CryptoWallet: SDKProvider {
         }
     }
 
-    override fun getTokens(responseHandler: (result: Result<Tokens, java.lang.Exception>) -> Unit) {
+    override fun getTokens(responseHandler: (result: Result<Tokens, Exception>) -> Unit) {
         val result = walletStorage.publicAddress()
         when (result) {
             is Success -> apiService.getTokens(result.value, responseHandler)
@@ -65,7 +65,7 @@ object CryptoWallet: SDKProvider {
     }
 
     override fun getTransactions(
-        responseHandler: (result: Result<List<Transaction>, java.lang.Exception>) -> Unit
+        responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     ) {
         val result = walletStorage.publicAddress()
         when (result) {
@@ -78,7 +78,7 @@ object CryptoWallet: SDKProvider {
         toAddress: WalletAddress,
         contractAddress: WalletAddress,
         sendTokenValue: BigDecimal,
-        responseHandler: (result: Result<Hash, java.lang.Exception>) -> Unit
+        responseHandler: (result: Result<Hash, Exception>) -> Unit
     ) {
         val result = walletStorage.publicAddress()
         val credentials = walletStorage.getCredentials()

@@ -1,7 +1,5 @@
 package com.qiibee.wallet_sdk.util
 
-import java.lang.Exception
-
 class InvalidWalletAddress(address: String): Exception("Wallet address not valid => $address")
 class WalletNotFound: Exception("Wallet not stored")
 class WalletCreateFailed(error: String): Exception(error)
