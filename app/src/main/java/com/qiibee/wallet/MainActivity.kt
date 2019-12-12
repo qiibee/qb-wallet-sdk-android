@@ -20,8 +20,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        when (val result = CryptoWallet.loadWallet()) {
-            is Success -> loadBalances(result.value)
+        when (CryptoWallet.loadWallet()) {
+            is Success -> {
+                getTokens()
+                loadBalances()
+                getTransactions()
+            }
             is Failure -> Logger.log("LOAD WALLET FAILED")
         }
     }
@@ -42,13 +46,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun loadBalances(walletAddress: WalletAddress) {
-        CryptoWallet.getBalances(walletAddress) { result ->
+    fun loadBalances() {
+        CryptoWallet.getBalances { result ->
             when (result) {
                 is Success -> {
+                    Logger.log(result.value.balances.ethBalance.balance.toString())
+                }
+                is Failure -> {
                     Logger.log(result.toString())
                 }
+            }
+        }
+    }
 
+    fun getTokens() {
+        CryptoWallet.getTokens { result ->
+            when (result) {
+                is Success -> {
+                    for (token in result.value.privateTokens) {
+                        Logger.log(token.contractAddress.address)
+                    }
+                }
+                is Failure -> {
+                    Logger.log(result.toString())
+                }
+            }
+        }
+    }
+
+    fun getTransactions() {
+        CryptoWallet.getTransactions { result ->
+            when (result) {
+                is Success -> {
+                    for (tx in result.value) {
+                        Logger.log(tx.toString())
+                    }
+                }
                 is Failure -> {
                     Logger.log(result.toString())
                 }
