@@ -6,7 +6,7 @@ import org.web3j.crypto.Credentials
 import org.web3j.crypto.Hash
 import java.math.BigDecimal
 
-interface HttpClient {
+internal interface HttpClient {
     fun getBalances(
         walletAddress: WalletAddress,
         responseHandler: (result: Result<TokenBalances, Exception>) -> Unit

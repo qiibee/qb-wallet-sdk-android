@@ -10,7 +10,7 @@ import de.adorsys.android.securestoragelibrary.SecurePreferences
 import org.web3j.crypto.Credentials
 import org.web3j.utils.Numeric
 
-object StorageService: StorageProvider {
+internal object StorageService: StorageProvider {
 
     override fun mnemonicPhrase(context: Context): Result<Mnemonic, Exception> {
         val decryptedMessage = SecurePreferences.getStringValue(

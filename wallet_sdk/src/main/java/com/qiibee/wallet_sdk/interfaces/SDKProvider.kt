@@ -6,7 +6,7 @@ import com.qiibee.wallet_sdk.util.Result
 import org.web3j.crypto.Hash
 import java.math.BigDecimal
 
-interface SDKProvider {
+internal interface SDKProvider {
     // Storage related
     fun walletAddress(context: Context): Result<WalletAddress, Exception>
 

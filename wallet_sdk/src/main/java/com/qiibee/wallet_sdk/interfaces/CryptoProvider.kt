@@ -5,7 +5,7 @@ import com.qiibee.wallet_sdk.client.PrivateKey
 import com.qiibee.wallet_sdk.util.Result
 import org.web3j.crypto.Credentials
 
-interface CryptoProvider {
+internal interface CryptoProvider {
     fun createMnemonic(): Result<Mnemonic, Exception>
     fun createWallet(mnemonic: Mnemonic): Result<Credentials, Exception>
     fun deriveCredentials(privateKey: PrivateKey): Credentials

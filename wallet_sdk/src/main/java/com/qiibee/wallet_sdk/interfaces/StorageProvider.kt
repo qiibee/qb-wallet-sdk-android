@@ -7,7 +7,7 @@ import com.qiibee.wallet_sdk.client.WalletAddress
 import com.qiibee.wallet_sdk.util.Result
 import org.web3j.crypto.Credentials
 
-interface StorageProvider {
+internal interface StorageProvider {
     // GETTERS
     fun walletAddress(context: Context): Result<WalletAddress, Exception>
 

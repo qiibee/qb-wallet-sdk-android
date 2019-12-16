@@ -10,7 +10,7 @@ import org.web3j.crypto.Credentials
 import org.web3j.crypto.MnemonicUtils
 import java.security.SecureRandom
 
-object CryptoService: CryptoProvider {
+internal object CryptoService: CryptoProvider {
     override fun createMnemonic(): Result<Mnemonic, Exception> {
         return try {
             val initialEntropy = ByteArray(16)
