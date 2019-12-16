@@ -62,7 +62,6 @@ internal object ApiService: HttpClient {
                 when (result) {
                     is Result.Failure -> {
                         val (_, error) = result
-                        Logger.log(result.toString())
                         responseHandler.invoke(Failure(GetTransactionsFailed("${error?.message}")))
                     }
                     is Result.Success -> {
@@ -127,7 +126,6 @@ internal object ApiService: HttpClient {
                 when (result) {
                     is Result.Failure -> {
                         val (_, error) = result
-                        Logger.log(result.toString())
                         responseHandler.invoke(Failure(GetTransactionsFailed("${error?.message}")))
                     }
                     is Result.Success -> {
