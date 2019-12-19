@@ -1,5 +1,6 @@
 package com.qiibee.wallet_sdk.services
 
+import android.net.Uri
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.result.Result
 import com.qiibee.wallet_sdk.client.*
@@ -19,7 +20,13 @@ internal object ApiService: HttpClient {
         walletAddress: WalletAddress,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<TokenBalances, Exception>) -> Unit
     ) {
-        Fuel.get( "$QB_APP_API/addresses/${walletAddress.address}?public=true")
+
+        val uri = Uri.parse("$QB_APP_API/addresses/${walletAddress.address}")
+            .buildUpon()
+            .appendQueryParameter("public", "true")
+            .toString()
+
+        Fuel.get(uri)
             .responseObject(JsonDeserializer.TokenBalancesDeserializer()) { _, _, result ->
                 when (result) {
                     is Result.Failure -> {
@@ -38,7 +45,13 @@ internal object ApiService: HttpClient {
         walletAddress: WalletAddress,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Tokens, Exception>) -> Unit
     ) {
-        Fuel.get( "$QB_API/tokens?public=true&walletAddress=${walletAddress.address}")
+        val uri = Uri.parse("$QB_API/tokens")
+            .buildUpon()
+            .appendQueryParameter("public", "true")
+            .appendQueryParameter("walletAddress", walletAddress.address)
+            .toString()
+
+        Fuel.get(uri)
             .responseObject(JsonDeserializer.TokensDeserializer()) { _, _, result ->
                 when (result) {
                     is Result.Failure -> {
@@ -57,7 +70,7 @@ internal object ApiService: HttpClient {
         walletAddress: WalletAddress,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<List<Transaction>, Exception>) -> Unit
     ) {
-        Fuel.get( "$QB_API/transactions/${walletAddress.address}/history")
+        Fuel.get("$QB_API/transactions/${walletAddress.address}/history")
             .responseObject(JsonDeserializer.TransactionsDeserializer()) { _, _, result ->
                 when (result) {
                     is Result.Failure -> {
@@ -102,7 +115,15 @@ internal object ApiService: HttpClient {
         sendTokenValue: BigDecimal,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<RawTransaction, Exception>) -> Unit
     ) {
-        Fuel.get( "$QB_API/transactions/raw?from=${fromAddress.address}&to=${toAddress.address}&contractAddress=${contractAddress.address}&transferAmount=${sendTokenValue}")
+        val uri = Uri.parse("$QB_API/transactions/raw")
+            .buildUpon()
+            .appendQueryParameter("from", fromAddress.address)
+            .appendQueryParameter("to", toAddress.address)
+            .appendQueryParameter("contractAddress", contractAddress.address)
+            .appendQueryParameter("transferAmount", sendTokenValue.toString())
+            .toString()
+
+        Fuel.get(uri)
             .responseObject(JsonDeserializer.RawTxDeserializer()) { _, _, result ->
                 when (result) {
                     is Result.Failure -> {
