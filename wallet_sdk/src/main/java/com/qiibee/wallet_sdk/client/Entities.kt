@@ -1,7 +1,5 @@
 package com.qiibee.wallet_sdk.client
 
-import com.qiibee.wallet_sdk.util.Assertion
-import com.qiibee.wallet_sdk.util.InvalidTokenSymbol
 import java.math.BigDecimal
 import java.sql.Timestamp
 
@@ -20,7 +18,7 @@ data class Tokens (
 )
 
 data class Token (
-    val symbol: TokenSymbol,
+    val symbol: String,
     val balance: BigDecimal,
     val contractAddress: WalletAddress
 )
@@ -30,14 +28,6 @@ data class Balances(
     val publicTokens: List<Token>,
     val ethBalance: ETHBalance
 )
-
-data class TokenSymbol(val symbol: String) {
-    init {
-        if (!Assertion.isValidTokenSymbol(symbol)) {
-            throw InvalidTokenSymbol(symbol)
-        }
-    }
-}
 
 data class Transaction(
     val to: WalletAddress,

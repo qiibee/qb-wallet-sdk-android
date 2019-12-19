@@ -115,7 +115,7 @@ private data class TokenIntermediate (
 ) {
     fun formatToToken(): Token {
         return Token(
-            TokenSymbol(symbol),
+            symbol,
             BigDecimal(balance?:"0"),
             WalletAddress(contractAddress)
         )
@@ -174,7 +174,7 @@ private data class BalancesDeserializerHelper(
     }
 
     private fun createToken(symbol: String, balance: String, address: String): Token {
-        return Token(TokenSymbol(symbol), BigDecimal(balance), WalletAddress(address))
+        return Token(symbol, BigDecimal(balance), WalletAddress(address))
     }
 
     private data class BalanceContractIntermediate(

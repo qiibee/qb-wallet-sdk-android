@@ -7,7 +7,6 @@ class WalletNotFound: Exception("Wallet not stored")
 class WalletCreationFailed(error: String): Exception(error)
 class InvalidMnemonicPhrase(phrase: String): Exception("Invalid Mnemonic Phrase: $phrase")
 class InvalidPrivateKey(key: String): Exception("Invalid Private Key: $key")
-class InvalidTokenSymbol(name: String): Exception("Token Name not valid: $name")
 class WalletAddressNotFound: Exception()
 class PrivateKeyNotFound: Exception()
 
