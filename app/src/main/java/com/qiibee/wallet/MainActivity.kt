@@ -1,12 +1,15 @@
 package com.qiibee.wallet
 
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
-import com.qiibee.wallet_sdk.Wallet
+import com.qiibee.wallet_sdk.client.CryptoWallet
+import com.qiibee.wallet_sdk.client.WalletAddress
+import com.qiibee.wallet_sdk.util.Failure
+import com.qiibee.wallet_sdk.util.Logger
+import com.qiibee.wallet_sdk.util.Success
 
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,16 +20,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-
-        val wallet = Wallet()
-
-        findViewById<TextView>(R.id.txt).let {
-            it?.text = wallet.p
-        }
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, wallet.show_wallet(), Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        when (CryptoWallet.loadWallet()) {
+            is Success -> {
+                getTokens()
+                loadBalances()
+                getTransactions()
+            }
+            is Failure -> Logger.log("LOAD WALLET FAILED")
         }
     }
 
@@ -43,6 +43,49 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    fun loadBalances() {
+        CryptoWallet.getBalances { result ->
+            when (result) {
+                is Success -> {
+                    Logger.log(result.value.balances.ethBalance.balance.toString())
+                }
+                is Failure -> {
+                    Logger.log(result.toString())
+                }
+            }
+        }
+    }
+
+    fun getTokens() {
+        CryptoWallet.getTokens { result ->
+            when (result) {
+                is Success -> {
+                    for (token in result.value.privateTokens) {
+                        Logger.log(token.contractAddress.address)
+                    }
+                }
+                is Failure -> {
+                    Logger.log(result.toString())
+                }
+            }
+        }
+    }
+
+    fun getTransactions() {
+        CryptoWallet.getTransactions { result ->
+            when (result) {
+                is Success -> {
+                    for (tx in result.value) {
+                        Logger.log(tx.toString())
+                    }
+                }
+                is Failure -> {
+                    Logger.log(result.toString())
+                }
+            }
         }
     }
 }
