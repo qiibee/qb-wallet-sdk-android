@@ -116,7 +116,7 @@ private data class TokenIntermediate (
     fun formatToToken(): Token {
         return Token(
             symbol,
-            BigDecimal(balance?:"0"),
+            BigDecimal(balance?: "0"),
             WalletAddress(contractAddress)
         )
     }
