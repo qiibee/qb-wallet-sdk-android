@@ -7,40 +7,37 @@ import org.web3j.crypto.Hash
 import java.math.BigDecimal
 
 internal interface SDKProvider {
+    // Construction related
+    fun initialize(context: Context)
+
     // Storage related
-    fun walletAddress(context: Context): Result<WalletAddress, Exception>
+    fun walletAddress(): Result<WalletAddress, Exception>
 
-    fun privateKey(context: Context): Result<PrivateKey, Exception>
+    fun privateKey(): Result<PrivateKey, Exception>
 
-    fun mnemonicPhrase(context: Context): Result<Mnemonic, Exception>
-
-    fun walletExists(context: Context): Boolean
+    fun mnemonicPhrase(): Result<Mnemonic, Exception>
 
     // Wallet Related
-    fun createWallet(context: Context): Result<WalletAddress, Exception>
+    fun createWallet(): Result<WalletAddress, Exception>
 
-    fun restoreWallet(context: Context, mnemonic: Mnemonic): Result<WalletAddress, Exception>
+    fun restoreWallet(mnemonic: Mnemonic): Result<WalletAddress, Exception>
 
-    fun removeWallet(context: Context)
+    fun removeWallet(): Result<Unit, Exception>
 
     // Backend API Related
     fun getBalances(
-        context: Context,
         responseHandler: (result: Result<TokenBalances, Exception>) -> Unit
     )
 
     fun getTokens(
-        context: Context,
         responseHandler: (result: Result<Tokens, Exception>) -> Unit
     )
 
     fun getTransactions(
-        context: Context,
         responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     )
 
     fun transferTokens(
-        context: Context,
         toAddress: WalletAddress,
         contractAddress: WalletAddress,
         sendTokenValue: BigDecimal,

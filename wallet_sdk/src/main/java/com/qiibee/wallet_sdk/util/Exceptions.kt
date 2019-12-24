@@ -9,6 +9,9 @@ class InvalidMnemonicPhrase(phrase: String): Exception("Invalid Mnemonic Phrase:
 class InvalidPrivateKey(key: String): Exception("Invalid Private Key: $key")
 class WalletAddressNotFound: Exception()
 class PrivateKeyNotFound: Exception()
+class WalletSDKNotInitialized: Exception("Wallet SDK not initialized with proper Context")
+class RemoveWalletFailed(error: String): Exception(error)
+class StoreWalletDetailsFailed(error: String): Exception(error)
 
 // API Specific Exceptions
 class GetTokenBalancesFailed(error: String) : Exception(error)

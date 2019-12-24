@@ -54,23 +54,30 @@ internal object StorageService: StorageProvider {
         }
     }
 
-    override fun walletExists(context: Context): Boolean {
-        return when (mnemonicPhrase(context)) {
-            is Success -> true
-            is Failure -> false
+    override fun storeWalletDetails(
+        context: Context,
+        credentials: Credentials,
+        mnemonic: Mnemonic
+    ): Result<Unit, Exception> {
+        return try {
+            val privateKey = Numeric.toHexStringWithPrefix(credentials.ecKeyPair.privateKey)
+
+            SecurePreferences.setValue(context, Constants.PRIVATE_KEY, privateKey)
+            SecurePreferences.setValue(context, Constants.WALLET_ADDRESS, credentials.address)
+            SecurePreferences.setValue(context, Constants.MNEMONIC_PHRASE, mnemonic.phrase)
+            Success(Unit)
+        } catch (e: Exception) {
+            Failure(StoreWalletDetailsFailed(e.message.toString()))
         }
     }
 
-    override fun storeWalletDetails(context: Context, credentials: Credentials, mnemonic: Mnemonic) {
-        val privateKey = Numeric.toHexStringWithPrefix(credentials.ecKeyPair.privateKey)
-
-        SecurePreferences.setValue(context, Constants.PRIVATE_KEY, privateKey)
-        SecurePreferences.setValue(context, Constants.WALLET_ADDRESS, credentials.address)
-        SecurePreferences.setValue(context, Constants.MNEMONIC_PHRASE, mnemonic.phrase)
-    }
-
-    override fun removeWallet(context: Context) {
-        SecurePreferences.clearAllValues(context)
+    override fun removeWallet(context: Context): Result<Unit, Exception> {
+        return try {
+            SecurePreferences.clearAllValues(context)
+            Success(Unit)
+        } catch (e: Exception) {
+            Failure(RemoveWalletFailed(e.message.toString()))
+        }
     }
 
 }

@@ -15,10 +15,9 @@ internal interface StorageProvider {
 
     fun mnemonicPhrase(context: Context): Result<Mnemonic, Exception>
 
-    fun walletExists(context: Context): Boolean
-
     // SETTERS
     fun storeWalletDetails(context: Context, credentials: Credentials, mnemonic: Mnemonic)
+            :Result<Unit, Exception>
 
-    fun removeWallet(context: Context)
+    fun removeWallet(context: Context): Result<Unit, Exception>
 }

@@ -17,42 +17,114 @@ object CryptoWallet: SDKProvider {
     private val walletStorage: StorageProvider = StorageService
     private val cryptoService: CryptoProvider = CryptoService
 
+    private var context: Context? = null
+
+    // INITIALIZATION
+    override fun initialize(context: Context) {
+        this.context = context
+    }
+
     // STORAGE RELATED
-    override fun walletAddress(context: Context): Result<WalletAddress, Exception> {
-        return walletStorage.walletAddress(context)
+    override fun walletAddress(): Result<WalletAddress, Exception> {
+        return when (val contextResult = getContext()) {
+            is Success -> walletStorage.walletAddress(contextResult.value)
+            is Failure -> contextResult
+        }
     }
 
-    override fun walletExists(context: Context): Boolean {
-        return walletStorage.walletExists(context)
+    override fun mnemonicPhrase(): Result<Mnemonic, Exception> {
+        return when (val contextResult = getContext()) {
+            is Success -> walletStorage.mnemonicPhrase(contextResult.value)
+            is Failure -> contextResult
+        }
     }
 
-    override fun mnemonicPhrase(context: Context): Result<Mnemonic, Exception> {
-        return walletStorage.mnemonicPhrase(context)
-    }
-
-    override fun privateKey(context: Context): Result<PrivateKey, Exception> {
-        return walletStorage.privateKey(context)
+    override fun privateKey(): Result<PrivateKey, Exception> {
+        return when (val contextResult = getContext()) {
+            is Success -> walletStorage.privateKey(contextResult.value)
+            is Failure -> contextResult
+        }
     }
 
     // WALLET RELATED
-    override fun createWallet(context: Context): Result<WalletAddress, Exception> {
-        val mnemonicResult = cryptoService.createMnemonic()
-
-        return when (mnemonicResult) {
+    override fun createWallet(): Result<WalletAddress, Exception> {
+        return when (val mnemonicResult = cryptoService.createMnemonic()) {
             is Success -> {
-                restoreWallet(context, mnemonicResult.value)
+                restoreWallet(mnemonicResult.value)
             }
             is Failure -> Failure(WalletCreationFailed("${mnemonicResult.reason.message}"))
         }
     }
 
     override fun restoreWallet(
-        context: Context,
         mnemonic: Mnemonic
     ): Result<WalletAddress, Exception> {
-        val walletResult = cryptoService.createWallet(mnemonic)
+        return when (val contextResult = getContext()) {
+            is Success -> restoreWalletHelper(contextResult.value, mnemonic)
+            is Failure -> contextResult
+        }
+    }
 
-        return when (walletResult) {
+    override fun removeWallet(): Result<Unit, Exception> {
+        return when (val contextResult = getContext()) {
+            is Success -> walletStorage.removeWallet(contextResult.value)
+            is Failure -> contextResult
+        }
+    }
+
+    // BACKEND API RELATED
+    override fun getBalances(responseHandler: (result: Result<TokenBalances, Exception>) -> Unit) {
+        return when (val contextResult = getContext()) {
+            is Success -> getBalancesHelper(contextResult.value, responseHandler)
+            is Failure -> responseHandler.invoke(contextResult)
+        }
+    }
+
+    override fun getTokens(responseHandler: (result: Result<Tokens, Exception>) -> Unit) {
+        return when (val contextResult = getContext()) {
+            is Success -> getTokensHelper(contextResult.value, responseHandler)
+            is Failure -> responseHandler.invoke(contextResult)
+        }
+    }
+
+    override fun getTransactions(
+        responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
+    ) {
+        return when (val contextResult = getContext()) {
+            is Success -> getTransactionsHelper(contextResult.value, responseHandler)
+            is Failure -> responseHandler.invoke(contextResult)
+        }
+    }
+
+    override fun transferTokens(
+        toAddress: WalletAddress,
+        contractAddress: WalletAddress,
+        sendTokenValue: BigDecimal,
+        responseHandler: (result: Result<Hash, Exception>) -> Unit
+    ) {
+        return when (val contextResult = getContext()) {
+            is Success ->
+                transferTokensHelper(
+                    contextResult.value,
+                    toAddress,
+                    contractAddress,
+                    sendTokenValue,
+                    responseHandler
+                )
+            is Failure -> responseHandler.invoke(contextResult)
+        }
+    }
+
+    // Private Helpers
+    private fun getContext(): Result<Context, Exception> {
+        context?.let {
+            return Success(it)
+        }
+        return Failure(WalletSDKNotInitialized())
+    }
+
+    private fun restoreWalletHelper(context: Context, mnemonic: Mnemonic): Result<WalletAddress, Exception> {
+        return when (val walletResult = cryptoService.createWallet(mnemonic)) {
             is Success -> {
                 val credentials = walletResult.value
                 walletStorage.storeWalletDetails(context, credentials, mnemonic)
@@ -62,53 +134,48 @@ object CryptoWallet: SDKProvider {
         }
     }
 
-    override fun removeWallet(context: Context) {
-        walletStorage.removeWallet(context)
-    }
-
-    // BACKEND API RELATED
-    override fun getBalances(context: Context, responseHandler: (result: Result<TokenBalances, Exception>) -> Unit) {
-        val result = walletStorage.walletAddress(context)
-        when (result) {
+    private fun getBalancesHelper(
+        context: Context,
+        responseHandler: (result: Result<TokenBalances, Exception>) -> Unit)
+    {
+        when (val result = walletStorage.walletAddress(context)) {
             is Success -> apiService.getBalances(result.value, responseHandler)
             is Failure -> responseHandler.invoke(result)
         }
     }
 
-    override fun getTokens(context: Context, responseHandler: (result: Result<Tokens, Exception>) -> Unit) {
-        val result = walletStorage.walletAddress(context)
-        when (result) {
+    private fun getTokensHelper(
+        context: Context,
+        responseHandler: (result: Result<Tokens, Exception>) -> Unit
+    ) {
+        when (val result = walletStorage.walletAddress(context)) {
             is Success -> apiService.getTokens(result.value, responseHandler)
             is Failure -> responseHandler.invoke(result)
         }
     }
 
-    override fun getTransactions(
+    private fun getTransactionsHelper(
         context: Context,
         responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     ) {
-        val result = walletStorage.walletAddress(context)
-        when (result) {
+        when (val result = walletStorage.walletAddress(context)) {
             is Success -> apiService.getTransactions(result.value, responseHandler)
             is Failure -> responseHandler.invoke(result)
         }
     }
 
-    override fun transferTokens(
+    private fun transferTokensHelper(
         context: Context,
         toAddress: WalletAddress,
         contractAddress: WalletAddress,
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<Hash, Exception>) -> Unit
     ) {
-        val walletResult = walletStorage.walletAddress(context)
-
-        when (walletResult) {
+        when (val walletResult = walletStorage.walletAddress(context)) {
             is Success -> {
                 val fromAddress = walletResult.value
-                val privateKeyResult = walletStorage.privateKey(context)
 
-                when (privateKeyResult) {
+                when (val privateKeyResult = walletStorage.privateKey(context)) {
                     is Success -> {
                         val credentials = cryptoService.deriveCredentials(privateKeyResult.value)
 
@@ -127,4 +194,5 @@ object CryptoWallet: SDKProvider {
             is Failure -> responseHandler.invoke(walletResult)
         }
     }
+
 }
