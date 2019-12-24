@@ -37,7 +37,7 @@ internal interface SDKProvider {
         responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     )
 
-    fun transferTokens(
+    fun sendTransaction(
         toAddress: WalletAddress,
         contractAddress: WalletAddress,
         sendTokenValue: BigDecimal,

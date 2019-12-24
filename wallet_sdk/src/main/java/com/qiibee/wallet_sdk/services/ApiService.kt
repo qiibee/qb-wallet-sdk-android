@@ -85,7 +85,7 @@ internal object ApiService: HttpClient {
             }
     }
 
-    override fun sendTransaction(
+    fun sendTransaction(
         fromAddress: WalletAddress,
         credentials: Credentials,
         toAddress: WalletAddress,
@@ -93,22 +93,10 @@ internal object ApiService: HttpClient {
         sendTokenValue: BigDecimal,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Hash, Exception>) -> Unit
     ) {
-        getRawTransaction(fromAddress, toAddress, contractAddress, sendTokenValue) {
-            when (it) {
-                is Success -> {
-                    val rawTx = it.value
-                    val signedTx = CryptoUtils.signTx(rawTx, credentials)
-                    sendSignedTransaction(signedTx, responseHandler)
-                }
 
-                is Failure -> {
-                    responseHandler.invoke(it)
-                }
-            }
-        }
     }
 
-    private fun getRawTransaction(
+    override fun getRawTransaction(
         fromAddress: WalletAddress,
         toAddress: WalletAddress,
         contractAddress: WalletAddress,
@@ -138,7 +126,7 @@ internal object ApiService: HttpClient {
             }
     }
 
-    private fun sendSignedTransaction(
+    override fun sendSignedTransaction(
         signedTx: ByteArray,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Hash, Exception>) -> Unit
     ) {

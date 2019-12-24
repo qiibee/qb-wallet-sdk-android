@@ -1,8 +1,9 @@
 package com.qiibee.wallet_sdk.client
 
 import android.content.Context
-import org.web3j.crypto.Hash
 import java.math.BigDecimal
+import org.web3j.crypto.Hash
+import org.web3j.crypto.Credentials
 import com.qiibee.wallet_sdk.interfaces.CryptoProvider
 import com.qiibee.wallet_sdk.interfaces.HttpClient
 import com.qiibee.wallet_sdk.interfaces.SDKProvider
@@ -96,7 +97,7 @@ object CryptoWallet: SDKProvider {
         }
     }
 
-    override fun transferTokens(
+    override fun sendTransaction(
         toAddress: WalletAddress,
         contractAddress: WalletAddress,
         sendTokenValue: BigDecimal,
@@ -104,7 +105,7 @@ object CryptoWallet: SDKProvider {
     ) {
         return when (val contextResult = getContext()) {
             is Success ->
-                transferTokensHelper(
+                sendTransactionHelper(
                     contextResult.value,
                     toAddress,
                     contractAddress,
@@ -164,7 +165,7 @@ object CryptoWallet: SDKProvider {
         }
     }
 
-    private fun transferTokensHelper(
+    private fun sendTransactionHelper(
         context: Context,
         toAddress: WalletAddress,
         contractAddress: WalletAddress,
@@ -173,14 +174,12 @@ object CryptoWallet: SDKProvider {
     ) {
         when (val walletResult = walletStorage.walletAddress(context)) {
             is Success -> {
-                val fromAddress = walletResult.value
-
                 when (val privateKeyResult = walletStorage.privateKey(context)) {
                     is Success -> {
                         val credentials = cryptoService.deriveCredentials(privateKeyResult.value)
 
-                        apiService.sendTransaction(
-                            fromAddress,
+                        signAndSendTransaction(
+                            walletResult.value,
                             credentials,
                             toAddress,
                             contractAddress,
@@ -192,6 +191,28 @@ object CryptoWallet: SDKProvider {
                 }
             }
             is Failure -> responseHandler.invoke(walletResult)
+        }
+    }
+
+    private fun signAndSendTransaction(
+        fromAddress: WalletAddress,
+        credentials: Credentials,
+        toAddress: WalletAddress,
+        contractAddress: WalletAddress,
+        sendTokenValue: BigDecimal,
+        responseHandler: (result: Result<Hash, Exception>) -> Unit
+    ) {
+        apiService.getRawTransaction(fromAddress, toAddress, contractAddress, sendTokenValue) {
+            when (it) {
+                is Success -> {
+                    val rawTx = it.value
+                    val signedTx = CryptoUtils.signTx(rawTx, credentials)
+                    apiService.sendSignedTransaction(signedTx, responseHandler)
+                }
+                is Failure -> {
+                    responseHandler.invoke(it)
+                }
+            }
         }
     }
 
