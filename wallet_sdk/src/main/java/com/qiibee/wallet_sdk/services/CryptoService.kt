@@ -39,6 +39,7 @@ internal object CryptoService: CryptoProvider {
 
     // Custom function for creating Credentials in order to avoid
     // problem with different privateKey being generated compered to other Crypto libraries
+    // URL: https://github.com/web3j/web3j/issues/919
     private fun createCredentialsFrom(mnemonic: Mnemonic): Credentials {
         // "m/44'/60'/0'/0/0"
         val path = intArrayOf(44 or HARDENED_BIT, 60 or HARDENED_BIT, 0 or HARDENED_BIT, 0, 0)
