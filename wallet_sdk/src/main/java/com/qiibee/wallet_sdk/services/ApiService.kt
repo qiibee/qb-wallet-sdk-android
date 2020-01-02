@@ -7,7 +7,6 @@ import com.qiibee.wallet_sdk.client.*
 import com.qiibee.wallet_sdk.interfaces.HttpClient
 import com.qiibee.wallet_sdk.util.*
 import org.json.JSONObject
-import org.web3j.crypto.Credentials
 import org.web3j.crypto.Hash
 import org.web3j.crypto.RawTransaction
 import java.math.BigDecimal
@@ -83,17 +82,6 @@ internal object ApiService: HttpClient {
                     }
                 }
             }
-    }
-
-    fun sendTransaction(
-        fromAddress: WalletAddress,
-        credentials: Credentials,
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
-        sendTokenValue: BigDecimal,
-        responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Hash, Exception>) -> Unit
-    ) {
-
     }
 
     override fun getRawTransaction(
