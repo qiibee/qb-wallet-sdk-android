@@ -60,8 +60,7 @@ internal object StorageService: StorageProvider {
         mnemonic: Mnemonic
     ): Result<Unit, Exception> {
         return try {
-            val privateKey = Numeric.toHexStringWithPrefix(credentials.ecKeyPair.privateKey)
-
+            val privateKey = formatPrivateKey(credentials)
             SecurePreferences.setValue(context, Constants.PRIVATE_KEY, privateKey)
             SecurePreferences.setValue(context, Constants.WALLET_ADDRESS, credentials.address)
             SecurePreferences.setValue(context, Constants.MNEMONIC_PHRASE, mnemonic.phrase)
@@ -80,4 +79,8 @@ internal object StorageService: StorageProvider {
         }
     }
 
+    private fun formatPrivateKey(credentials: Credentials): String {
+        return Constants.ZERO_PREFIX +
+                Numeric.toHexStringNoPrefix(credentials.ecKeyPair.privateKey)
+    }
 }
