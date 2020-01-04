@@ -34,7 +34,7 @@ internal object StorageService: StorageProvider {
         )
 
         return if (decryptedMessage == "") {
-            Failure(PrivateKeyNotFound())
+            Failure(WalletNotFound())
         } else {
             Success(PrivateKey("$decryptedMessage"))
         }
@@ -48,7 +48,7 @@ internal object StorageService: StorageProvider {
         )
 
         return if (decryptedMessage == "") {
-            Failure(WalletAddressNotFound())
+            Failure(WalletNotFound())
         } else {
             Success(Address("$decryptedMessage"))
         }

@@ -54,7 +54,7 @@ internal object ApiService: HttpClient {
                 when (result) {
                     is Result.Failure -> {
                         val (_, error) = result
-                        responseHandler.invoke(Failure(GetTokenBalancesFailed("${error?.message}")))
+                        responseHandler.invoke(Failure(GetTokensFailed("${error?.message}")))
                     }
                     is Result.Success -> {
                         val (data, _) = result
@@ -104,7 +104,7 @@ internal object ApiService: HttpClient {
                 when (result) {
                     is Result.Failure -> {
                         val (_, error) = result
-                        responseHandler.invoke(Failure(GetTokenBalancesFailed("${error?.message}")))
+                        responseHandler.invoke(Failure(GetRawTransactionFailed("${error?.message}")))
                     }
                     is Result.Success -> {
                         val (data, _) = result
