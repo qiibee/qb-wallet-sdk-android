@@ -5,18 +5,15 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import java.math.BigDecimal
 import com.qiibee.wallet_sdk.client.CryptoWallet
 import com.qiibee.wallet_sdk.client.Mnemonic
-import com.qiibee.wallet_sdk.client.WalletAddress
+import com.qiibee.wallet_sdk.client.Address
 import com.qiibee.wallet_sdk.util.Failure
 import com.qiibee.wallet_sdk.util.Success
 import kotlinx.android.synthetic.main.activity_main.*
-import java.math.BigDecimal
 
 class MainActivity : AppCompatActivity() {
-
-    private val INFO = "INFO_LOG"
-    private val ERROR = "ERROR_LOG"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +43,10 @@ class MainActivity : AppCompatActivity() {
     fun getWalletAddress() {
         when (val result = CryptoWallet.walletAddress()) {
             is Success -> {
-                Log.d(INFO, "wallet address is ${result.value.address}")
+                Logger.log("wallet address is ${result.value.address}")
             }
             is Failure -> {
-                Log.e(ERROR, "failed with ${result.reason.message}")
+                Logger.log("failed with ${result.reason.message}")
             }
         }
     }
@@ -57,10 +54,10 @@ class MainActivity : AppCompatActivity() {
     fun getPrivateKey() {
         when (val result = CryptoWallet.privateKey()) {
             is Success -> {
-                Log.d(INFO, "private key is ${result.value.privateKey}")
+                Logger.log("private key is ${result.value.privateKey}")
             }
             is Failure -> {
-                Log.e(ERROR, "failed with ${result.reason.message}")
+                Logger.log("failed with ${result.reason.message}")
             }
         }
     }
@@ -68,10 +65,10 @@ class MainActivity : AppCompatActivity() {
     fun getMnemonicPhrase() {
         when (val result = CryptoWallet.mnemonicPhrase()) {
             is Success -> {
-                Log.d(INFO, "phrase is ${result.value.phrase}")
+                Logger.log("phrase is ${result.value.phrase}")
             }
             is Failure -> {
-                Log.e(ERROR, "failed with ${result.reason.message}")
+                Logger.log("failed with ${result.reason.message}")
             }
         }
     }
@@ -79,33 +76,39 @@ class MainActivity : AppCompatActivity() {
     fun createWallet() {
         when (val result = CryptoWallet.createWallet()) {
             is Success -> {
-                Log.d(INFO, "created wallet with address: ${result.value.address}")
+                Logger.log("created wallet with address: ${result.value.address}")
             }
             is Failure -> {
-                Log.e(ERROR, "failed with ${result.reason.message}")
+                Logger.log("failed with ${result.reason.message}")
             }
         }
     }
 
     fun restoreWallet() {
-        val validMnemonic = Mnemonic("station hard under bus always prompts film story tires valid fake phrase")
-        when (val result = CryptoWallet.restoreWallet(validMnemonic)) {
-            is Success -> {
-                Log.d(INFO, "restored wallet with address: ${result.value.address}")
+        try {
+            val validMnemonic = Mnemonic("your mnemonic address original here payment book process stuff work remote mercy")
+            when (val result = CryptoWallet.restoreWallet(validMnemonic)) {
+                is Success -> {
+                    Logger.log("restored wallet with address: ${result.value.address}")
+                }
+                is Failure -> {
+                    Logger.log("failed with ${result.reason.message}")
+                }
             }
-            is Failure -> {
-                Log.e(ERROR, "failed with ${result.reason.message}")
-            }
+        } catch (e: Error) {
+            Logger.log(e.toString())
         }
+
+
     }
 
     fun removeStoredWallet() {
         when (val result = CryptoWallet.removeWallet()) {
             is Success -> {
-                Log.d(INFO, "wallet successfully removed")
+                Logger.log("wallet successfully removed")
             }
             is Failure -> {
-                Log.e(ERROR, "failed with ${result.reason.message}")
+                Logger.log("failed with ${result.reason.message}")
             }
         }
     }
@@ -114,10 +117,10 @@ class MainActivity : AppCompatActivity() {
         CryptoWallet.getBalances {
             when (it) {
                 is Success -> {
-                    Log.d(INFO, "balances: ${it.value.balances}")
+                    Logger.log("balances: ${it.value.balances}")
                 }
                 is Failure -> {
-                    Log.e(ERROR, "failed with ${it.reason.message}")
+                    Logger.log("failed with ${it.reason.message}")
                 }
             }
         }
@@ -127,10 +130,10 @@ class MainActivity : AppCompatActivity() {
         CryptoWallet.getTokens {
             when (it) {
                 is Success -> {
-                    Log.d(INFO, "public tokens: ${it.value.publicTokens}, private tokens ${it.value.privateTokens}")
+                    Logger.log("public tokens: ${it.value.publicTokens}, private tokens ${it.value.privateTokens}")
                 }
                 is Failure -> {
-                    Log.e(ERROR, "failed with ${it.reason.message}")
+                    Logger.log("failed with ${it.reason.message}")
                 }
             }
         }
@@ -141,35 +144,36 @@ class MainActivity : AppCompatActivity() {
             when (it) {
                 is Success -> {
                     for (tx in it.value) {
-                        Log.d(INFO, "contractAddress: ${tx.contractAddress} - from:${tx.from}")
+                        Logger.log("contractAddress: ${tx.contractAddress} - from:${tx.from}")
                     }
                 }
                 is Failure -> {
-                    Log.e(ERROR, "failed with ${it.reason.message}")
+                    Logger.log("failed with ${it.reason.message}")
                 }
             }
         }
     }
 
     fun sendTransaction() {
-        val toAddress = WalletAddress("valid address here")
-        val contractAddress = WalletAddress("valid address here")
-        val value = BigDecimal(0.324)
+        val toAddress = Address("0x6d5p603bnE331f045bft74Ee84AdjEj6j9b1251f")
+        val contractAddress = Address("0xf2e71f41e670c2823684ac3dbdf48166084e5af3")
+        val value = BigDecimal(3.4)
 
         CryptoWallet.sendTransaction(toAddress, contractAddress, value){
             when (it) {
                 is Success -> {
-                    Log.d(INFO, "Hash of the transactions is ${it.value}")
+                    Logger.log("Hash of the transactions is ${it.value}")
                 }
                 is Failure -> {
-                    Log.e(ERROR, "failed with ${it.reason.message}")
+                    Logger.log("failed with ${it.reason.message}")
                 }
             }
         }
     }
+}
 
-
-
-
-
+object Logger {
+    fun log(s: String) {
+        Log.d("TAG", s)
+    }
 }
