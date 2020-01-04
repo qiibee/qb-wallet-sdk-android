@@ -7,8 +7,8 @@ import com.qiibee.wallet_sdk.client.*
 import com.qiibee.wallet_sdk.interfaces.HttpClient
 import com.qiibee.wallet_sdk.util.*
 import org.json.JSONObject
-import org.web3j.crypto.Hash
 import org.web3j.crypto.RawTransaction
+import org.web3j.utils.Convert
 import java.math.BigDecimal
 
 internal object ApiService: HttpClient {
@@ -91,12 +91,13 @@ internal object ApiService: HttpClient {
         sendTokenValue: BigDecimal,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<RawTransaction, Exception>) -> Unit
     ) {
+        val weiValue = CryptoUtils.etherToWeiString(sendTokenValue)
         val uri = Uri.parse("$QB_API/transactions/raw")
             .buildUpon()
             .appendQueryParameter("from", fromAddress.address)
             .appendQueryParameter("to", toAddress.address)
             .appendQueryParameter("contractAddress", contractAddress.address)
-            .appendQueryParameter("transferAmount", sendTokenValue.toString())
+            .appendQueryParameter("transferAmount", weiValue)
             .toString()
 
         Fuel.get(uri)
@@ -115,15 +116,21 @@ internal object ApiService: HttpClient {
     }
 
     override fun sendSignedTransaction(
-        signedTx: ByteArray,
+        signedTx: String,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Hash, Exception>) -> Unit
     ) {
-        Fuel.post( "$QB_API/transactions/").body(stringifySignedTx(signedTx))
+        val uri = Uri.parse("$QB_API/transactions/")
+            .buildUpon()
+            .toString()
+
+        Fuel.post(uri)
+            .header("Content-Type", "application/json")
+            .body(formatToBodyType(signedTx))
             .responseObject(JsonDeserializer.SendTransactionDeserializer()) { _, _, result ->
                 when (result) {
                     is Result.Failure -> {
                         val (_, error) = result
-                        responseHandler.invoke(Failure(GetTransactionsFailed("${error?.message}")))
+                        responseHandler.invoke(Failure(SendTransactionFailed("${error?.message}")))
                     }
                     is Result.Success -> {
                         val (data, _) = result
@@ -133,8 +140,8 @@ internal object ApiService: HttpClient {
             }
     }
 
-    private fun stringifySignedTx(signedTx: ByteArray): String {
+    private fun formatToBodyType(signedTx: String): String {
         val jsonObject = JSONObject()
-        return jsonObject.put("data", signedTx.toString()).toString()
+        return jsonObject.put("data", signedTx).toString()
     }
 }
