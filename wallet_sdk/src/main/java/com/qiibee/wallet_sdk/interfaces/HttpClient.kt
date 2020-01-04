@@ -7,17 +7,17 @@ import java.math.BigDecimal
 
 internal interface HttpClient {
     fun getBalances(
-        walletAddress: WalletAddress,
+        address: Address,
         responseHandler: (result: Result<TokenBalances, Exception>) -> Unit
     )
 
     fun getTokens(
-        walletAddress: WalletAddress,
+        address: Address,
         responseHandler: (result: Result<Tokens, Exception>) -> Unit
     )
 
     fun getTransactions(
-        walletAddress: WalletAddress,
+        address: Address,
         responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     )
 
@@ -27,9 +27,9 @@ internal interface HttpClient {
     )
 
     fun getRawTransaction(
-        fromAddress: WalletAddress,
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
+        fromAddress: Address,
+        toAddress: Address,
+        contractAddress: Address,
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<RawTransaction, Exception>) -> Unit
     )

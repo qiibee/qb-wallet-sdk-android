@@ -24,7 +24,7 @@ data class Tokens (
 data class Token (
     val symbol: String,
     val balance: BigDecimal,
-    val contractAddress: WalletAddress
+    val contractAddress: Address
 )
 
 data class Balances(
@@ -34,9 +34,9 @@ data class Balances(
 )
 
 data class Transaction(
-    val to: WalletAddress,
-    val from: WalletAddress,
-    val contractAddress: WalletAddress,
+    val to: Address,
+    val from: Address,
+    val contractAddress: Address,
     val timestamp: Timestamp,
     val token: Token
 )

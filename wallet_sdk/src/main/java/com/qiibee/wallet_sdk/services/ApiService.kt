@@ -8,7 +8,6 @@ import com.qiibee.wallet_sdk.interfaces.HttpClient
 import com.qiibee.wallet_sdk.util.*
 import org.json.JSONObject
 import org.web3j.crypto.RawTransaction
-import org.web3j.utils.Convert
 import java.math.BigDecimal
 
 internal object ApiService: HttpClient {
@@ -16,11 +15,11 @@ internal object ApiService: HttpClient {
     private const val QB_APP_API = "${QB_API}/app"
 
     override fun getBalances(
-        walletAddress: WalletAddress,
+        address: Address,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<TokenBalances, Exception>) -> Unit
     ) {
 
-        val uri = Uri.parse("$QB_APP_API/addresses/${walletAddress.address}")
+        val uri = Uri.parse("$QB_APP_API/addresses/${address.address}")
             .buildUpon()
             .appendQueryParameter("public", "true")
             .toString()
@@ -41,13 +40,13 @@ internal object ApiService: HttpClient {
     }
 
     override fun getTokens(
-        walletAddress: WalletAddress,
+        address: Address,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<Tokens, Exception>) -> Unit
     ) {
         val uri = Uri.parse("$QB_API/tokens")
             .buildUpon()
             .appendQueryParameter("public", "true")
-            .appendQueryParameter("walletAddress", walletAddress.address)
+            .appendQueryParameter("walletAddress", address.address)
             .toString()
 
         Fuel.get(uri)
@@ -66,10 +65,10 @@ internal object ApiService: HttpClient {
     }
 
     override fun getTransactions(
-        walletAddress: WalletAddress,
+        address: Address,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<List<Transaction>, Exception>) -> Unit
     ) {
-        Fuel.get("$QB_API/transactions/${walletAddress.address}/history")
+        Fuel.get("$QB_API/transactions/${address.address}/history")
             .responseObject(JsonDeserializer.TransactionsDeserializer()) { _, _, result ->
                 when (result) {
                     is Result.Failure -> {
@@ -85,9 +84,9 @@ internal object ApiService: HttpClient {
     }
 
     override fun getRawTransaction(
-        fromAddress: WalletAddress,
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
+        fromAddress: Address,
+        toAddress: Address,
+        contractAddress: Address,
         sendTokenValue: BigDecimal,
         responseHandler: (result: com.qiibee.wallet_sdk.util.Result<RawTransaction, Exception>) -> Unit
     ) {

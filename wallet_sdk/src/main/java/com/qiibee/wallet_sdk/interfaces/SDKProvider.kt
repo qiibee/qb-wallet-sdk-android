@@ -10,16 +10,16 @@ internal interface SDKProvider {
     fun initialize(context: Context)
 
     // Storage related
-    fun walletAddress(): Result<WalletAddress, Exception>
+    fun walletAddress(): Result<Address, Exception>
 
     fun privateKey(): Result<PrivateKey, Exception>
 
     fun mnemonicPhrase(): Result<Mnemonic, Exception>
 
     // Wallet Related
-    fun createWallet(): Result<WalletAddress, Exception>
+    fun createWallet(): Result<Address, Exception>
 
-    fun restoreWallet(mnemonic: Mnemonic): Result<WalletAddress, Exception>
+    fun restoreWallet(mnemonic: Mnemonic): Result<Address, Exception>
 
     fun removeWallet(): Result<Unit, Exception>
 
@@ -37,8 +37,8 @@ internal interface SDKProvider {
     )
 
     fun sendTransaction(
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
+        toAddress: Address,
+        contractAddress: Address,
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<Hash, Exception>) -> Unit
     )

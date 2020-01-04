@@ -8,7 +8,6 @@ import com.qiibee.wallet_sdk.client.*
 import org.web3j.crypto.RawTransaction
 import org.web3j.utils.Numeric
 import java.math.BigDecimal
-import java.math.BigInteger
 import java.sql.Timestamp
 
 internal object JsonDeserializer {
@@ -71,9 +70,9 @@ private data class TransactionIntermediate(
 ) {
     fun formatTransaction(): Transaction {
         return Transaction(
-            WalletAddress(to),
-            WalletAddress(from),
-            WalletAddress(contractAddress),
+            Address(to),
+            Address(from),
+            Address(contractAddress),
             Timestamp(timestamp),
             token.formatToToken()
         )
@@ -119,7 +118,7 @@ private data class TokenIntermediate (
         return Token(
             symbol,
             BigDecimal(balance?: "0"),
-            WalletAddress(contractAddress)
+            Address(contractAddress)
         )
     }
 }
@@ -176,7 +175,7 @@ private data class BalancesDeserializerHelper(
     }
 
     private fun createToken(symbol: String, balance: String, address: String): Token {
-        return Token(symbol, BigDecimal(balance), WalletAddress(address))
+        return Token(symbol, BigDecimal(balance), Address(address))
     }
 
     private data class BalanceContractIntermediate(

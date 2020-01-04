@@ -3,7 +3,7 @@ package com.qiibee.wallet_sdk.services
 import android.content.Context
 import com.qiibee.wallet_sdk.client.Mnemonic
 import com.qiibee.wallet_sdk.client.PrivateKey
-import com.qiibee.wallet_sdk.client.WalletAddress
+import com.qiibee.wallet_sdk.client.Address
 import com.qiibee.wallet_sdk.interfaces.StorageProvider
 import com.qiibee.wallet_sdk.util.*
 import de.adorsys.android.securestoragelibrary.SecurePreferences
@@ -40,7 +40,7 @@ internal object StorageService: StorageProvider {
         }
     }
 
-    override fun walletAddress(context: Context): Result<WalletAddress, Exception> {
+    override fun walletAddress(context: Context): Result<Address, Exception> {
         val decryptedMessage = SecurePreferences.getStringValue(
             context,
             Constants.WALLET_ADDRESS,
@@ -50,7 +50,7 @@ internal object StorageService: StorageProvider {
         return if (decryptedMessage == "") {
             Failure(WalletAddressNotFound())
         } else {
-            Success(WalletAddress("$decryptedMessage"))
+            Success(Address("$decryptedMessage"))
         }
     }
 

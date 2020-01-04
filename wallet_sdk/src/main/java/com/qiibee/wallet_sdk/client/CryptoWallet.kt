@@ -25,7 +25,7 @@ object CryptoWallet: SDKProvider {
     }
 
     // STORAGE RELATED
-    override fun walletAddress(): Result<WalletAddress, Exception> {
+    override fun walletAddress(): Result<Address, Exception> {
         return when (val contextResult = getContext()) {
             is Success -> walletStorage.walletAddress(contextResult.value)
             is Failure -> contextResult
@@ -47,7 +47,7 @@ object CryptoWallet: SDKProvider {
     }
 
     // WALLET RELATED
-    override fun createWallet(): Result<WalletAddress, Exception> {
+    override fun createWallet(): Result<Address, Exception> {
         return when (val mnemonicResult = cryptoService.createMnemonic()) {
             is Success -> {
                 restoreWallet(mnemonicResult.value)
@@ -58,7 +58,7 @@ object CryptoWallet: SDKProvider {
 
     override fun restoreWallet(
         mnemonic: Mnemonic
-    ): Result<WalletAddress, Exception> {
+    ): Result<Address, Exception> {
         return when (val contextResult = getContext()) {
             is Success -> restoreWalletHelper(contextResult.value, mnemonic)
             is Failure -> contextResult
@@ -97,8 +97,8 @@ object CryptoWallet: SDKProvider {
     }
 
     override fun sendTransaction(
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
+        toAddress: Address,
+        contractAddress: Address,
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<Hash, Exception>) -> Unit
     ) {
@@ -123,12 +123,12 @@ object CryptoWallet: SDKProvider {
         return Failure(WalletSDKNotInitialized())
     }
 
-    private fun restoreWalletHelper(context: Context, mnemonic: Mnemonic): Result<WalletAddress, Exception> {
+    private fun restoreWalletHelper(context: Context, mnemonic: Mnemonic): Result<Address, Exception> {
         return when (val walletResult = cryptoService.createWallet(mnemonic)) {
             is Success -> {
                 val credentials = walletResult.value
                 walletStorage.storeWalletDetails(context, credentials, mnemonic)
-                Success(WalletAddress(credentials.address))
+                Success(Address(credentials.address))
             }
             is Failure -> Failure(WalletCreationFailed("${walletResult.reason.message}"))
         }
@@ -166,8 +166,8 @@ object CryptoWallet: SDKProvider {
 
     private fun sendTransactionHelper(
         context: Context,
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
+        toAddress: Address,
+        contractAddress: Address,
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<Hash, Exception>) -> Unit
     ) {
@@ -194,10 +194,10 @@ object CryptoWallet: SDKProvider {
     }
 
     private fun signAndSendTransaction(
-        fromAddress: WalletAddress,
+        fromAddress: Address,
         credentials: Credentials,
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
+        toAddress: Address,
+        contractAddress: Address,
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<Hash, Exception>) -> Unit
     ) {
