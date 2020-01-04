@@ -2,7 +2,6 @@ package com.qiibee.wallet_sdk.client
 
 import android.content.Context
 import java.math.BigDecimal
-import org.web3j.crypto.Hash
 import org.web3j.crypto.Credentials
 import com.qiibee.wallet_sdk.interfaces.CryptoProvider
 import com.qiibee.wallet_sdk.interfaces.HttpClient

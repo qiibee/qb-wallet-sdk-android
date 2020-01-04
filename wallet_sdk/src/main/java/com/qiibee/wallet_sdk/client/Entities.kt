@@ -3,6 +3,10 @@ package com.qiibee.wallet_sdk.client
 import java.math.BigDecimal
 import java.sql.Timestamp
 
+data class Hash(
+    val hash: String
+)
+
 data class TokenBalances(
     val transactionCount: Int,
     val balances: Balances,
