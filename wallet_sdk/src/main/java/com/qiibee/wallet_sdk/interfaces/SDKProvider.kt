@@ -3,7 +3,6 @@ package com.qiibee.wallet_sdk.interfaces
 import android.content.Context
 import com.qiibee.wallet_sdk.client.*
 import com.qiibee.wallet_sdk.util.Result
-import org.web3j.crypto.Hash
 import java.math.BigDecimal
 
 internal interface SDKProvider {

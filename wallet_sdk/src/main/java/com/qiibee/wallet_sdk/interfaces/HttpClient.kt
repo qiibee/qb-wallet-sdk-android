@@ -2,7 +2,6 @@ package com.qiibee.wallet_sdk.interfaces
 
 import com.qiibee.wallet_sdk.client.*
 import com.qiibee.wallet_sdk.util.Result
-import org.web3j.crypto.Hash
 import org.web3j.crypto.RawTransaction
 import java.math.BigDecimal
 
@@ -23,7 +22,7 @@ internal interface HttpClient {
     )
 
     fun sendSignedTransaction(
-        signedTx: ByteArray,
+        signedTx: String,
         responseHandler: (result: Result<Hash, Exception>) -> Unit
     )
 
