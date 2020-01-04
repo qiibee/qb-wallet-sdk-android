@@ -5,9 +5,10 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.qiibee.wallet_sdk.client.*
-import org.web3j.crypto.Hash
 import org.web3j.crypto.RawTransaction
+import org.web3j.utils.Numeric
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.sql.Timestamp
 
 internal object JsonDeserializer {
@@ -28,7 +29,8 @@ internal object JsonDeserializer {
 
     class RawTxDeserializer: ResponseDeserializable<RawTransaction> {
         override fun deserialize(content: String): RawTransaction {
-            return Gson().fromJson(content, RawTransaction::class.java)
+            return Gson().fromJson(content, RawTxIntermediate::class.java)
+                .formatToRawTx()
         }
     }
 
@@ -185,4 +187,31 @@ private data class BalancesDeserializerHelper(
     private data class BalanceIntermediate(
         val balance: String
     )
+}
+
+private data class RawTxIntermediate(
+    val to: String,
+    val from: String,
+    val nonce: String,
+    val gasPrice: String,
+    val gasLimit: String,
+    val value: String,
+    val data: String,
+    val chainId: String
+) {
+    fun formatToRawTx(): RawTransaction {
+        val nonceBigInt = Numeric.toBigInt(nonce)
+        val gasPriceBigInt = Numeric.toBigInt(gasPrice)
+        val gasLimitBigInt = Numeric.toBigInt(gasLimit)
+        val valueBigInt = Numeric.toBigInt(value)
+
+        return RawTransaction.createTransaction(
+            nonceBigInt,
+            gasPriceBigInt,
+            gasLimitBigInt,
+            to,
+            valueBigInt,
+            data
+        )
+    }
 }
