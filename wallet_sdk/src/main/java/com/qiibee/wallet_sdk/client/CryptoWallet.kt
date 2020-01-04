@@ -12,19 +12,32 @@ import com.qiibee.wallet_sdk.services.CryptoService
 import com.qiibee.wallet_sdk.services.StorageService
 import com.qiibee.wallet_sdk.util.*
 
+/**
+ * This object is your main entry point to Wallet SDK
+ *
+ * @property HttpClient
+ * @property StorageProvider
+ * @property CryptoProvider
+ * @property Context?
+ */
 object CryptoWallet: SDKProvider {
     private val apiService: HttpClient = ApiService
     private val walletStorage: StorageProvider = StorageService
     private val cryptoService: CryptoProvider = CryptoService
-
     private var context: Context? = null
 
-    // INITIALIZATION
+    /**
+     * Initializes context used for accessing Phone's storage.
+     */
     override fun initialize(context: Context) {
         this.context = context
     }
 
     // STORAGE RELATED
+    /**
+     * @return currently stored Wallet Address
+     * or Exception<WalletSDKNotInitialized || WalletNotFound>.
+     */
     override fun walletAddress(): Result<Address, Exception> {
         return when (val contextResult = getContext()) {
             is Success -> walletStorage.walletAddress(contextResult.value)
@@ -32,6 +45,10 @@ object CryptoWallet: SDKProvider {
         }
     }
 
+    /**
+     * @return currently stored Mnemonic Phrase
+     * or Exception<WalletSDKNotInitialized || WalletNotFound>.
+     */
     override fun mnemonicPhrase(): Result<Mnemonic, Exception> {
         return when (val contextResult = getContext()) {
             is Success -> walletStorage.mnemonicPhrase(contextResult.value)
@@ -39,6 +56,10 @@ object CryptoWallet: SDKProvider {
         }
     }
 
+    /**
+     * @return currently stored Private Key
+     * or Exception<WalletSDKNotInitialized || WalletNotFound>.
+     */
     override fun privateKey(): Result<PrivateKey, Exception> {
         return when (val contextResult = getContext()) {
             is Success -> walletStorage.privateKey(contextResult.value)
@@ -47,15 +68,25 @@ object CryptoWallet: SDKProvider {
     }
 
     // WALLET RELATED
+    /**
+     * Creates new Ether wallet.
+     * @return Address of newly created wallet
+     * or Exception<MnemonicCreationFailed || WalletSDKNotInitialized || WalletCreationFailed>.
+     */
     override fun createWallet(): Result<Address, Exception> {
         return when (val mnemonicResult = cryptoService.createMnemonic()) {
             is Success -> {
                 restoreWallet(mnemonicResult.value)
             }
-            is Failure -> Failure(WalletCreationFailed("${mnemonicResult.reason.message}"))
+            is Failure -> mnemonicResult
         }
     }
 
+    /**
+     * Restores existing Ether wallet.
+     * @return Address of restored wallet
+     * or Exception<WalletSDKNotInitialized || WalletCreationFailed>
+     */
     override fun restoreWallet(
         mnemonic: Mnemonic
     ): Result<Address, Exception> {
@@ -65,6 +96,11 @@ object CryptoWallet: SDKProvider {
         }
     }
 
+    /**
+     * Removes existing Wallet data.
+     * @return Succes<Unit> if deletion succeeds,
+     * or Exception<WalletSDKNotInitialized || RemoveWalletFailed>
+     */
     override fun removeWallet(): Result<Unit, Exception> {
         return when (val contextResult = getContext()) {
             is Success -> walletStorage.removeWallet(contextResult.value)
@@ -73,6 +109,11 @@ object CryptoWallet: SDKProvider {
     }
 
     // BACKEND API RELATED
+    /**
+     * Gets current balances and passes them to callback,
+     * Exception<WalletSDKNotInitialized || WalletNotFound || GetTokenBalancesFailed>
+     * is passed if the call fails.
+     */
     override fun getBalances(responseHandler: (result: Result<TokenBalances, Exception>) -> Unit) {
         return when (val contextResult = getContext()) {
             is Success -> getBalancesHelper(contextResult.value, responseHandler)
@@ -80,6 +121,11 @@ object CryptoWallet: SDKProvider {
         }
     }
 
+    /**
+     * Gets current tokens and passes them to callback,
+     * Exception<WalletSDKNotInitialized || WalletNotFound || GetTokensFailed>
+     * is passed if the call fails.
+     */
     override fun getTokens(responseHandler: (result: Result<Tokens, Exception>) -> Unit) {
         return when (val contextResult = getContext()) {
             is Success -> getTokensHelper(contextResult.value, responseHandler)
@@ -87,6 +133,11 @@ object CryptoWallet: SDKProvider {
         }
     }
 
+    /**
+     * Gets current transactions and passes them to callback,
+     * Exception<WalletSDKNotInitialized || WalletNotFound || GetTransactionsFailed>
+     * is passed if the call fails.
+     */
     override fun getTransactions(
         responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     ) {
@@ -96,6 +147,12 @@ object CryptoWallet: SDKProvider {
         }
     }
 
+    /**
+     * Performs send transaction, on Success Hash is passed to the callback,
+     * Exception<WalletSDKNotInitialized || WalletNotFound ||
+     * GetRawTransactionFailed || SendTransactionFailed>
+     * is passed if the call fails.
+     */
     override fun sendTransaction(
         toAddress: Address,
         contractAddress: Address,
@@ -130,7 +187,7 @@ object CryptoWallet: SDKProvider {
                 walletStorage.storeWalletDetails(context, credentials, mnemonic)
                 Success(Address(credentials.address))
             }
-            is Failure -> Failure(WalletCreationFailed("${walletResult.reason.message}"))
+            is Failure -> walletResult
         }
     }
 
