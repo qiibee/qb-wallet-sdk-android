@@ -28,6 +28,10 @@ object CryptoWallet: SDKProvider {
 
     /**
      * Initializes context used for accessing Phone's storage.
+     *
+     * @apiNote must initialize context before using CryptoWallet
+     * @param context Context
+     *
      */
     override fun initialize(context: Context) {
         this.context = context
@@ -84,6 +88,7 @@ object CryptoWallet: SDKProvider {
 
     /**
      * Restores existing Ether wallet.
+     * @param mnemonic Mnemonic
      * @return Address of restored wallet
      * or Exception<WalletSDKNotInitialized || WalletCreationFailed>
      */
@@ -110,6 +115,9 @@ object CryptoWallet: SDKProvider {
 
     // BACKEND API RELATED
     /**
+     *
+     * @param responseHandler Result<TokenBalances, Exception) -> Unit
+     *
      * Gets current balances and passes them to callback,
      * Exception<WalletSDKNotInitialized || WalletNotFound || GetTokenBalancesFailed>
      * is passed if the call fails.
@@ -122,6 +130,9 @@ object CryptoWallet: SDKProvider {
     }
 
     /**
+     *
+     * @param responseHandler Result<Tokens, Exception> -> Unit
+     *
      * Gets current tokens and passes them to callback,
      * Exception<WalletSDKNotInitialized || WalletNotFound || GetTokensFailed>
      * is passed if the call fails.
@@ -134,6 +145,9 @@ object CryptoWallet: SDKProvider {
     }
 
     /**
+     *
+     * @param responseHandler Result<List<Transaction>, Exception> -> Unit
+     *
      * Gets current transactions and passes them to callback,
      * Exception<WalletSDKNotInitialized || WalletNotFound || GetTransactionsFailed>
      * is passed if the call fails.
@@ -148,6 +162,12 @@ object CryptoWallet: SDKProvider {
     }
 
     /**
+     *
+     * @param toAddress Address
+     * @param contractAddress Address
+     * @param sendTokenValue BigDecimal
+     * @param responseHandler Result<Hash, Exception> -> Unit     *
+     *
      * Performs send transaction, on Success Hash is passed to the callback,
      * Exception<WalletSDKNotInitialized || WalletNotFound ||
      * GetRawTransactionFailed || SendTransactionFailed>
