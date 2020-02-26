@@ -1,22 +1,27 @@
 package com.qiibee.wallet_sdk.interfaces
 
+import android.content.Context
 import com.qiibee.wallet_sdk.client.*
 import com.qiibee.wallet_sdk.util.Result
-import org.web3j.crypto.Hash
 import java.math.BigDecimal
 
-interface SDKProvider {
+internal interface SDKProvider {
+    // Construction related
+    fun initialize(context: Context)
+
     // Storage related
-    fun loadWallet(): Result<WalletAddress, Exception>
+    fun walletAddress(): Result<Address, Exception>
 
     fun privateKey(): Result<PrivateKey, Exception>
 
     fun mnemonicPhrase(): Result<Mnemonic, Exception>
 
-    fun walletExists(): Boolean
-
     // Wallet Related
-    fun createWallet(): Result<WalletAddress, Exception>
+    fun createWallet(): Result<Address, Exception>
+
+    fun restoreWallet(mnemonic: Mnemonic): Result<Address, Exception>
+
+    fun removeWallet(): Result<Unit, Exception>
 
     // Backend API Related
     fun getBalances(
@@ -31,9 +36,9 @@ interface SDKProvider {
         responseHandler: (result: Result<List<Transaction>, Exception>) -> Unit
     )
 
-    fun transferTokens(
-        toAddress: WalletAddress,
-        contractAddress: WalletAddress,
+    fun sendTransaction(
+        toAddress: Address,
+        contractAddress: Address,
         sendTokenValue: BigDecimal,
         responseHandler: (result: Result<Hash, Exception>) -> Unit
     )

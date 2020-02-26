@@ -14,9 +14,5 @@ object Assertion {
 
     fun isValidPrivateKey(key: String): Boolean {
         return WalletUtils.isValidPrivateKey(key)
-    }
-
-    fun isValidTokenSymbol(name: String): Boolean {
-        return name.length >= 2 && name.length <= 4
-    }
+    }    
 }

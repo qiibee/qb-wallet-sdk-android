@@ -5,8 +5,8 @@ import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
 import com.qiibee.wallet_sdk.client.*
-import org.web3j.crypto.Hash
 import org.web3j.crypto.RawTransaction
+import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.sql.Timestamp
 
@@ -28,7 +28,8 @@ internal object JsonDeserializer {
 
     class RawTxDeserializer: ResponseDeserializable<RawTransaction> {
         override fun deserialize(content: String): RawTransaction {
-            return Gson().fromJson(content, RawTransaction::class.java)
+            return Gson().fromJson(content, RawTxIntermediate::class.java)
+                .formatToRawTx()
         }
     }
 
@@ -69,9 +70,9 @@ private data class TransactionIntermediate(
 ) {
     fun formatTransaction(): Transaction {
         return Transaction(
-            WalletAddress(to),
-            WalletAddress(from),
-            WalletAddress(contractAddress),
+            Address(to),
+            Address(from),
+            Address(contractAddress),
             Timestamp(timestamp),
             token.formatToToken()
         )
@@ -115,9 +116,9 @@ private data class TokenIntermediate (
 ) {
     fun formatToToken(): Token {
         return Token(
-            TokenSymbol(symbol),
-            BigDecimal(balance?:"0"),
-            WalletAddress(contractAddress)
+            symbol,
+            BigDecimal(balance?: "0"),
+            Address(contractAddress)
         )
     }
 }
@@ -174,7 +175,7 @@ private data class BalancesDeserializerHelper(
     }
 
     private fun createToken(symbol: String, balance: String, address: String): Token {
-        return Token(TokenSymbol(symbol), BigDecimal(balance), WalletAddress(address))
+        return Token(symbol, BigDecimal(balance), Address(address))
     }
 
     private data class BalanceContractIntermediate(
@@ -185,4 +186,31 @@ private data class BalancesDeserializerHelper(
     private data class BalanceIntermediate(
         val balance: String
     )
+}
+
+private data class RawTxIntermediate(
+    val to: String,
+    val from: String,
+    val nonce: String,
+    val gasPrice: String,
+    val gasLimit: String,
+    val value: String,
+    val data: String,
+    val chainId: String
+) {
+    fun formatToRawTx(): RawTransaction {
+        val nonceBigInt = Numeric.toBigInt(nonce)
+        val gasPriceBigInt = Numeric.toBigInt(gasPrice)
+        val gasLimitBigInt = Numeric.toBigInt(gasLimit)
+        val valueBigInt = Numeric.toBigInt(value)
+
+        return RawTransaction.createTransaction(
+            nonceBigInt,
+            gasPriceBigInt,
+            gasLimitBigInt,
+            to,
+            valueBigInt,
+            data
+        )
+    }
 }

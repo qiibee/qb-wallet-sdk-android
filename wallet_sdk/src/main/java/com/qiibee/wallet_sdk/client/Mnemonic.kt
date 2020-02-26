@@ -6,7 +6,7 @@ import com.qiibee.wallet_sdk.util.InvalidMnemonicPhrase
 data class Mnemonic(val phrase: String) {
     init {
         if (!Assertion.isValidMnemonic(phrase)) {
-            throw InvalidMnemonicPhrase("Mnemonic phrase not valid")
+            throw InvalidMnemonicPhrase(phrase)
         }
     }
 }
