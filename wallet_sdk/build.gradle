@@ -52,7 +52,7 @@ publish {
     userOrg = 'qiibee'
     groupId = 'com.qiibee'
     artifactId = 'wallet_sdk'
-    publishVersion = '0.1'
+    publishVersion = '0.1.1'
     desc = 'qiibee Wallet SDK'
     website = 'https://github.com/qiibee/qb-wallet-sdk-android'
 }
@@ -75,7 +75,7 @@ ext {
 
     developerId = 'qiibee'
     developerName = 'Elvis Dedic'
-    developerEmail = 'tech@qiibee.com' 
+    developerEmail = 'tech@qiibee.com'
 
     licenseName = 'The MIT License'
     licenseUrl = 'https://opensource.org/licenses/MIT'
