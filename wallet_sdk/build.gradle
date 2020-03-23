@@ -52,7 +52,7 @@ publish {
     userOrg = 'qiibee-com'
     groupId = 'com.qiibee'
     artifactId = 'qb-wallet-sdk'
-    publishVersion = '0.1.0'
+    publishVersion = '0.1.1'
     desc = 'qiibee Wallet SDK'
     website = 'https://github.com/qiibee/qb-wallet-sdk-android'
     issueTracker = 'https://github.com/qiibee/qb-wallet-sdk-android/issues'
