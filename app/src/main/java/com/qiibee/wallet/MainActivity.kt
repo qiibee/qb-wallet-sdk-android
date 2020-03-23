@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     fun createWallet() {
         when (val result = CryptoWallet.createWallet()) {
             is Success -> {
-                Logger.log("created wallet with address: ${result.value.address}")
+                Logger.log("created wallet with address: ${result.value.publicKey.address}")
             }
             is Failure -> {
                 Logger.log("failed with ${result.reason.message}")
@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
             val validMnemonic = Mnemonic("your mnemonic address original here payment book process stuff work remote mercy")
             when (val result = CryptoWallet.restoreWallet(validMnemonic)) {
                 is Success -> {
-                    Logger.log("restored wallet with address: ${result.value.address}")
+                    Logger.log("restored wallet with address: ${result.value.publicKey.address}")
                 }
                 is Failure -> {
                     Logger.log("failed with ${result.reason.message}")
