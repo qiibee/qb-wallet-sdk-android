@@ -13,4 +13,9 @@ internal object CryptoUtils {
     fun etherToWeiString(value: BigDecimal): String {
         return Convert.toWei(value, Convert.Unit.ETHER).toBigInteger().toString()
     }
+
+    fun formatPrivateKey(credentials: Credentials): String {
+        return Constants.ZERO_PREFIX +
+                Numeric.toHexStringNoPrefix(credentials.ecKeyPair.privateKey)
+    }
 }

@@ -17,9 +17,9 @@ internal interface SDKProvider {
     fun mnemonicPhrase(): Result<Mnemonic, Exception>
 
     // Wallet Related
-    fun createWallet(): Result<Address, Exception>
+    fun createWallet(): Result<Wallet, Exception>
 
-    fun restoreWallet(mnemonic: Mnemonic): Result<Address, Exception>
+    fun restoreWallet(mnemonic: Mnemonic): Result<Wallet, Exception>
 
     fun removeWallet(): Result<Unit, Exception>
 
