@@ -1,9 +1,5 @@
 apply plugin: 'com.android.library'
-<<<<<<< HEAD
 apply plugin: 'com.novoda.bintray-release'
-=======
-apply plugin: 'com.jfrog.bintray'
->>>>>>> eaccf14228f180754b22ce91914921d977b7b836
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'maven'

@@ -8,11 +8,7 @@ buildscript {
 
     }
     dependencies {
-<<<<<<< HEAD
         classpath 'com.android.tools.build:gradle:3.4.0'
-=======
-        classpath 'com.android.tools.build:gradle:3.6.1'
->>>>>>> eaccf14228f180754b22ce91914921d977b7b836
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
