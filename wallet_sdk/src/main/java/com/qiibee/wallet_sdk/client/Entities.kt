@@ -41,5 +41,10 @@ data class Transaction(
     val token: Token
 )
 
+data class Wallet(
+    val publicKey: Address,
+    val privateKey: PrivateKey,
+    val mnemonic: Mnemonic
+)
 
 

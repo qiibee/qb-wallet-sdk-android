@@ -77,7 +77,7 @@ object CryptoWallet: SDKProvider {
      * @return Address of newly created wallet
      * or Exception<MnemonicCreationFailed || WalletSDKNotInitialized || WalletCreationFailed>.
      */
-    override fun createWallet(): Result<Address, Exception> {
+    override fun createWallet(): Result<Wallet, Exception> {
         return when (val mnemonicResult = cryptoService.createMnemonic()) {
             is Success -> {
                 restoreWallet(mnemonicResult.value)
@@ -94,7 +94,7 @@ object CryptoWallet: SDKProvider {
      */
     override fun restoreWallet(
         mnemonic: Mnemonic
-    ): Result<Address, Exception> {
+    ): Result<Wallet, Exception> {
         return when (val contextResult = getContext()) {
             is Success -> restoreWalletHelper(contextResult.value, mnemonic)
             is Failure -> contextResult
@@ -200,12 +200,18 @@ object CryptoWallet: SDKProvider {
         return Failure(WalletSDKNotInitialized())
     }
 
-    private fun restoreWalletHelper(context: Context, mnemonic: Mnemonic): Result<Address, Exception> {
+    private fun restoreWalletHelper(context: Context, mnemonic: Mnemonic): Result<Wallet, Exception> {
         return when (val walletResult = cryptoService.createWallet(mnemonic)) {
             is Success -> {
                 val credentials = walletResult.value
                 walletStorage.storeWalletDetails(context, credentials, mnemonic)
-                Success(Address(credentials.address))
+                Success(
+                    Wallet(
+                        Address(credentials.address),
+                        PrivateKey(CryptoUtils.formatPrivateKey(credentials)),
+                        Mnemonic(mnemonic.phrase)
+                    )
+                )
             }
             is Failure -> walletResult
         }

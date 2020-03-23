@@ -1,11 +1,14 @@
-apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
+    compileSdkVersion 29
 
     lintOptions {
         abortOnError false
@@ -30,6 +33,18 @@ android {
 
 }
 
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.qiibee'
+            artifactId = 'qb-wallet-sdk'
+            version = '0.1.1'
+
+            artifact("$buildDir/build/outputs/aar/wallet_sdk-release.aar")
+        }
+    }
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -47,15 +62,26 @@ dependencies {
     implementation ('org.web3j:core:4.2.0-android')
 }
 
-publish {
-    repoName = "qb-wallet-sdk"
-    userOrg = 'qiibee-com'
-    groupId = 'com.qiibee'
-    artifactId = 'qb-wallet-sdk'
-    publishVersion = '0.1.0'
-    desc = 'qiibee Wallet SDK'
-    website = 'https://github.com/qiibee/qb-wallet-sdk-android'
-    issueTracker = 'https://github.com/qiibee/qb-wallet-sdk-android/issues'
-    licences = ["MIT"]
+bintray {
+    user = project.hasProperty('bintrayUser') ?: System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ?: System.getenv('BINTRAY_API_KEY')
+    pkg {
+        name = "qb-wallet-sdk"
+        repo = "qb-wallet-sdk"
+        userOrg = 'qiibee-com'
+        licenses = ["MIT"]
+        vcsUrl = "https://github.com/qiibee/qb-wallet-sdk-android.git"
+        desc = 'qiibee Wallet SDK'
+        //website = 'https://github.com/qiibee/qb-wallet-sdk-android'
+        //issueTracker = 'https://github.com/qiibee/qb-wallet-sdk-android/issues'
+        version {
+            name = "0.1.1"
+        }
+    }
+
+
+
+
+
 }
 
